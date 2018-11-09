@@ -312,8 +312,13 @@ def send_error_report():
 
 
 def main():
-    download_sheets()
-    process_sheets()
+    try:
+        download_sheets()
+        process_sheets()
+    except Exception as e:
+        log('Uncaught Error in main(): ' + str(e), True)
+    if (errors):
+        send_error_report()
 
 if __name__ == "__main__":
     main()
