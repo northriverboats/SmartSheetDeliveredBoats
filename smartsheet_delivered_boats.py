@@ -50,7 +50,7 @@ def mail_results(subject, body):
     m.setFrom(mFrom)
     m.addRecipient(mTo)
     m.addCC(os.getenv('MAIL_ALSO'))
-   
+
     m.setSubject(subject)
     m.setTextBody("You should not see this text in a MIME aware reader")
     m.setHtmlBody('<pre>\n' + body + '</pre>\n')
@@ -250,7 +250,7 @@ def process_sheet_to_pdf(file):
             log('             UNICONV FAILED TO CREATE PDF', True)
     except Exception as e:
         log('             FAILED TO CREATE XLSX AND PDF: ' + str(e), True)
-        
+
 
 def process_sheet_to_xlsx(file):
     # change variables here
