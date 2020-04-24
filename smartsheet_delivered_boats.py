@@ -22,6 +22,7 @@ reports = [
     {'id': '8402628385236868', 'name': 'Boat Country - Delivered Boats'},
     {'id': '1084278990759812', 'name': 'Clemens Eugene - Delivered Boats'},
     {'id': '381227204142980',  'name': 'Clemens Portland - Delivered Boats'},
+    {'id': '8947439265703812', 'name': 'Erie Marine Sales - Delivered Boats'},
     {'id': '8121565725386628', 'name': 'Elephant Boys - Delivered Boats'},
     {'id': '4252384307242884', 'name': 'Idaho Marine - Delivered Boats'},
     {'id': '6960979662661508', 'name': 'PGM - Delivered Boats'},
