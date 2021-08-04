@@ -319,7 +319,7 @@ def download_sheets():
 
 
 def send_error_report():
-    subject = 'Smartsheet Boats on Order Error Report'
+    subject = 'Smartsheet Deliverd Boats Error Report'
     mail_results(subject, log_text)
 
 
