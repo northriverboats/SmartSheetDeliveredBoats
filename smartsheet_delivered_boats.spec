@@ -6,7 +6,9 @@ block_cipher = None
 a = Analysis(['smartsheet_delivered_boats.py'],
              pathex=['/home/fwarren/.venv/smartsheet_delivered_boats'],
              binaries=[],
-             datas=[],
+             datas=[
+                 '.envrc','.'),
+             ],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
