@@ -1,7 +1,10 @@
 .direnv/*
-venv/*
 build/*
 dist/*
+venv/*
+.vscode/*
 __pycache__/*
 templates/downloads/*
-.envrc
+templates/temp.pdf
+.env
+*.swp
