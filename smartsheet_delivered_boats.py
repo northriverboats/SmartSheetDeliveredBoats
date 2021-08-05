@@ -9,11 +9,10 @@ import os
 import smartsheet
 import subprocess
 import sys
-from openpyxl.drawing.image import Image
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 from dotenv import load_dotenv
 from emailer import *
-
+from openpyxl.drawing.image import Image
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
 reports = [
     {'id': '7295282737112964', 'name': 'Alaska Frontier Fabrication - Delivered Boats'},
@@ -291,14 +290,16 @@ def process_sheet_to_xlsx(source_dir, target_dir, file):
         log('             FAILED TO CREATE XLSX: ' + str(e), True)
 
 
-def process_sheets(source_dir, target_dir):
+def process_sheets(source_dir, target_dir, pdf, excel):
     log("\nPROCESS SHEETS ===============================")
     os.chdir(source_dir + 'downloads/')
     for file in sorted(glob.glob('*.xlsx')):
-        log("  converting %s to pdf" % (file))
-        process_sheet_to_pdf(source_dir, target_dir, file)
-        log("  converting %s to xlsx" % (file))
-        process_sheet_to_xlsx(source_dir, target_dir, file)
+        if pdf:
+          log("  converting %s to pdf" % (file))
+          process_sheet_to_pdf(source_dir, target_dir, file)
+        if excel:
+          log("  converting %s to xlsx" % (file))
+          process_sheet_to_xlsx(source_dir, target_dir, file)
         log("")
 
 
@@ -325,18 +326,35 @@ def send_error_report():
 
 @click.command()
 @click.option(
+    '--list',
+    '-l',
+    'list_',
+    is_flag=True,
+    help='Print list of dealers'
+)
+@click.option(
     '--dealer',
     '-d',
     multiple=True,
-    help='Dealers to include'
+    help='Dealer to include (can use multiple times)'
 )
 @click.option(
     '--ignore',
     '-i',
     multiple=True,
-    help='Dealers to ignore'
+    help='Dealer to ignore (can use multiple times)'
 )
-def main(dealer, ignore):
+@click.option(
+    '--pdf/--no-pdf',
+    default=True,
+    help='Create PDFs unless --no-pdf'
+)
+@click.option(
+    '--excel/--no-excel',
+    default=True,
+    help='Create Excel Sheets unless --no-excel'
+)
+def main(list_, dealer, ignore, pdf, excel):
     # load environmental variables
     env_path = resource_path('.env')
     load_dotenv(dotenv_path=env_path)
@@ -345,26 +363,25 @@ def main(dealer, ignore):
     source_dir = os.getenv('SOURCE_DIR')
     target_dir = os.getenv('TARGET_DIR')
 
-    dealers = {}
+    if list_:
+        for report in reports:
+            print("'" + report['name'].split('-')[0].strip() + "'")
+        sys.exit(0)
+
     # Add dealers we want to report on
     if dealer:
-        for name in dealer:
-            item = reports.get(name)
-            if item:
-                dealers[name] = item
+        dealers = [r for r in reports if r['name'].split('-')[0].strip() in dealer]
     else:
         dealers = reports
 
     # Delete dealers we are not intested in
     if ignore:
-        for name in ignore:
-            if dealers.get(name):
-                del dealers[name]
+        dealers = [d for d in dealers if d['name'].split('-')[0].strip() not in ignore]
 
     # actual processing
     try:
-        download_sheets(api, source_dir)
-        process_sheets(source_dir, target_dir)
+        download_sheets(dealers, api, source_dir)
+        process_sheets(source_dir, target_dir, pdf, excel)
     except Exception as e:
         log('Uncaught Error in main(): ' + str(e), True)
     if (errors):
