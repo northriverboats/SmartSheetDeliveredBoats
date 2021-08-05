@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['smartsheet__delivered_boats.py'],
-             pathex=['/home/fwarren/builds/smartsheet__delivered_boats'],
+a = Analysis(['smartsheet_delivered_boats.py'],
+             pathex=['/home/fwarren/builds/smartsheet_delivered_boats'],
              binaries=[],
              datas=[
                  ('.env','.'),
@@ -28,7 +28,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='smartsheet__delivered_boats',
+          name='smartsheet_delivered_boats',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
