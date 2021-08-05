@@ -302,7 +302,7 @@ def process_sheets(source_dir, target_dir):
         log("")
 
 
-def download_sheets(api, source_dir):
+def download_sheets(dealers, api, source_dir):
     files = os.listdir(source_dir + 'downloads')
     for file in files:
         os.remove(os.path.join(source_dir + 'downloads', file))
@@ -310,7 +310,7 @@ def download_sheets(api, source_dir):
     smart = smartsheet.Smartsheet(api)
     smart.assume_user(os.getenv('SMARTSHEET_USER'))
     log("DOWNLOADING SHEETS ===========================")
-    for report in reports:
+    for report in dealers:
         log("  downloading sheet: " + report['name'])
         try:
             smart.Reports.get_report_as_excel(report['id'], source_dir + 'downloads')
@@ -323,7 +323,20 @@ def send_error_report():
     mail_results(subject, log_text)
 
 
-def main():
+@click.command()
+@click.option(
+    '--dealer',
+    '-d',
+    multiple=True,
+    help='Dealers to include'
+)
+@click.option(
+    '--ignore',
+    '-i',
+    multiple=True,
+    help='Dealers to ignore'
+)
+def main(dealer, ignore):
     # load environmental variables
     env_path = resource_path('.env')
     load_dotenv(dotenv_path=env_path)
@@ -331,6 +344,24 @@ def main():
     api = os.getenv('SMARTSHEET_API')
     source_dir = os.getenv('SOURCE_DIR')
     target_dir = os.getenv('TARGET_DIR')
+
+    dealers = {}
+    # Add dealers we want to report on
+    if dealer:
+        for name in dealer:
+            item = reports.get(name)
+            if item:
+                dealers[name] = item
+    else:
+        dealers = reports
+
+    # Delete dealers we are not intested in
+    if ignore:
+        for name in ignore:
+            if dealers.get(name):
+                del dealers[name]
+
+    # actual processing
     try:
         download_sheets(api, source_dir)
         process_sheets(source_dir, target_dir)
