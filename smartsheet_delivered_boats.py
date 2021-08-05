@@ -6,14 +6,13 @@ import datetime
 import glob
 import os
 import subprocess
+import sys
 import openpyxl
 from openpyxl.drawing.image import Image
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
+from dotenv import load_dotenv
 from emailer import *
 
-api = os.getenv('SMARTSHEET_API')
-source_dir = os.getenv('SOURCE_DIR')
-target_dir = os.getenv('TARGET_DIR')
 
 
 reports = [
@@ -227,7 +226,7 @@ def process_rows(wsOld,wsNew,base,forPDF):
     set_footer(wsNew, wsOld.max_row+offset+1)
     return offset
 
-def process_sheet_to_pdf(file):
+def process_sheet_to_pdf(source_dir, target_dir, file):
     # change variables here
     input_name = source_dir + 'downloads/' + file
     pdf_dir = (target_dir + 'Formatted - PDF/')
@@ -265,7 +264,7 @@ def process_sheet_to_pdf(file):
         log('             FAILED TO CREATE XLSX AND PDF: ' + str(e), True)
 
 
-def process_sheet_to_xlsx(file):
+def process_sheet_to_xlsx(source_dir, target_dir, file):
     # change variables here
     input_name = source_dir + 'downloads/' + file
     output_name = target_dir + file
@@ -292,18 +291,18 @@ def process_sheet_to_xlsx(file):
         log('             FAILED TO CREATE XLSX: ' + str(e), True)
 
 
-def process_sheets():
+def process_sheets(source_dir, target_dir):
     log("\nPROCESS SHEETS ===============================")
     os.chdir(source_dir + 'downloads/')
     for file in sorted(glob.glob('*.xlsx')):
         log("  converting %s to pdf" % (file))
-        process_sheet_to_pdf(file)
+        process_sheet_to_pdf(source_dir, target_dir, file)
         log("  converting %s to xlsx" % (file))
-        process_sheet_to_xlsx(file)
+        process_sheet_to_xlsx(source_dir, target_dir, file)
         log("")
 
 
-def download_sheets():
+def download_sheets(api, source_dir):
     files = os.listdir(source_dir + 'downloads')
     for file in files:
         os.remove(os.path.join(source_dir + 'downloads', file))
@@ -325,13 +324,21 @@ def send_error_report():
 
 
 def main():
+    # load environmental variables
+    env_path = resource_path('.env')
+    load_dotenv(dotenv_path=env_path)
+
+    api = os.getenv('SMARTSHEET_API')
+    source_dir = os.getenv('SOURCE_DIR')
+    target_dir = os.getenv('TARGET_DIR')
     try:
-        download_sheets()
-        process_sheets()
+        download_sheets(api, source_dir)
+        process_sheets(source_dir, target_dir)
     except Exception as e:
         log('Uncaught Error in main(): ' + str(e), True)
     if (errors):
         send_error_report()
+    sys.exit(0)
 
 if __name__ == "__main__":
     main()
