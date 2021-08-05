@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-import smartsheet
-import logging
+import click
 import datetime
 import glob
+import logging
+import openpyxl
 import os
+import smartsheet
 import subprocess
 import sys
-import openpyxl
 from openpyxl.drawing.image import Image
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 from dotenv import load_dotenv
 from emailer import *
-
 
 
 reports = [
