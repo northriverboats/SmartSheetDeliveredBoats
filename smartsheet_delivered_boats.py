@@ -252,7 +252,7 @@ def process_sheet_to_pdf(source_dir, target_dir, file):
     # save new sheet out to new file
     try:
         wbNew.save(output_name)
-        result = subprocess.call(['/usr/local/bin/unoconv',
+        result = subprocess.call(['/usr/bin/unoconv',
                          '-f', 'pdf',
                          '-t', source_dir + 'landscape.ots',
                          '--output='+ output_name[:-3] + 'pdf',
