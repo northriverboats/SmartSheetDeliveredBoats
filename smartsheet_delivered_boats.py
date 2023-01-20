@@ -10,7 +10,7 @@ import smartsheet
 import subprocess
 import sys
 from dotenv import load_dotenv
-from emailer import *
+from emailer import mail_results
 from openpyxl.drawing.image import Image
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 
@@ -43,19 +43,6 @@ def log(text, error=None):
     log_text += text + "\n"
     if (error):
         errors = True
-
-def mail_results(subject, body):
-    mFrom = os.getenv('MAIL_FROM')
-    mTo = os.getenv('MAIL_TO')
-    m = Email(os.getenv('MAIL_SERVER'))
-    m.setFrom(mFrom)
-    m.addRecipient(mTo)
-    m.addCC(os.getenv('MAIL_ALSO'))
-
-    m.setSubject(subject)
-    m.setTextBody("You should not see this text in a MIME aware reader")
-    m.setHtmlBody('<pre>\n' + body + '</pre>\n')
-    m.send()
 
 
 def resource_path(relative_path):
